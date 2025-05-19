@@ -5,6 +5,48 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Modern Minimalist Styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    @apply bg-neutral text-dark;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .btn {
+    @apply px-6 py-2 rounded-lg transition-all duration-300 font-medium;
+  }
+  
+  .btn-primary {
+    @apply bg-primary hover:bg-secondary text-white shadow-sm;
+  }
+  
+  .btn-outline {
+    @apply border border-primary text-primary hover:bg-primary hover:text-white;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-card p-6;
+  }
+  
+  .section {
+    @apply py-12 md:py-20;
+  }
+}
+
 /* Custom Global Styles */
 body {
     font-family: 'Inter', sans-serif;

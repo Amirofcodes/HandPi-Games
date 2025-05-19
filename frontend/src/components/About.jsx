@@ -1,25 +1,46 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
-const AboutCard = ({ number, text }) => {
-  return (
-    <div className="flex flex-col items-center gap-6">
-      <div className="relative w-48 h-48 rounded-full bg-number bg-opacity-80 flex items-center justify-center">
-        <div className="w-[152px] h-[152px] rounded-full bg-gradient-to-r from-[#4DC423] to-[#70DC4A] flex items-center justify-center">
-          <span className="text-5xl font-bold text-number-color">{number.padStart(2, '0')}</span>
-        </div>
-      </div>
-      <div className="flex items-start space-x-2">
-        <img src="/public/img/arrow-small.png" alt="Arrow" className="w-4 h-4 mt-2" />
-        <p className="text-white text-2xl max-w-[188px] text-start">{text}</p>
-      </div>
-    </div>
-  );
-};
+function About() {
+    const features = [
+        {
+            title: "Camera Recognition",
+            description: "Our machine learning model accurately recognizes hand gestures in real-time",
+            icon: "📷"
+        },
+        {
+            title: "Interactive Learning",
+            description: "Practice sign language through engaging and fun challenges",
+            icon: "✨"
+        },
+        {
+            title: "Progress Tracking",
+            description: "See your scores and track your improvement over time",
+            icon: "📊"
+        }
+    ];
 
-AboutCard.propTypes = {
-  number: PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired,
-};
+    return (
+        <section id="about" className="section bg-neutral">
+            <div className="container">
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+                    <p className="text-gray-600 max-w-2xl mx-auto">
+                        HandPi Games uses computer vision technology to detect and recognize your hand gestures, making sign language learning interactive and fun.
+                    </p>
+                </div>
 
-export default AboutCard;
+                <div className="grid md:grid-cols-3 gap-8">
+                    {features.map((feature, index) => (
+                        <div key={index} className="card hover:shadow-lg transition-shadow duration-300">
+                            <div className="text-4xl mb-4">{feature.icon}</div>
+                            <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                            <p className="text-gray-600">{feature.description}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+}
+
+export default About;
