@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify
 
-bp = Blueprint('user', __name__, url_prefix='/api/user')
+api_user = Blueprint('api_user', __name__)
 
-@bp.route('/profile', methods=['GET'])
-def get_profile():
-    # Implement user profile retrieval logic here
-    return jsonify({'message': 'User profile'})
+@api_user.route('/api/v1/user/profile', methods=['GET'])
+def get_user_profile():
+    # Placeholder for future user profile logic
+    return jsonify({'username': 'Guest', 'games_played': 0, 'high_score': 0}), 200

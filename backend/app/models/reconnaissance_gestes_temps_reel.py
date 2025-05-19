@@ -11,6 +11,7 @@ class ReconnaissanceGestesTempsReel:
         self.charger_modele(chemin_modele)
         self.labels_dict = labels_dict
         self.configurer_mediapipe()
+        self.last_prediction: str = 'Unknown'
 
     def charger_modele(self, chemin_modele: str):
         with open(chemin_modele, 'rb') as f:
@@ -39,29 +40,31 @@ class ReconnaissanceGestesTempsReel:
 
         results = self.hands.process(frame_rgb)
         if results.multi_hand_landmarks:
-            for hand_landmarks in results.multi_hand_landmarks:
-                self.mp_drawing.draw_landmarks(
-                    frame,
-                    hand_landmarks,
-                    self.mp_hands.HAND_CONNECTIONS,
-                    self.mp_drawing_styles.get_default_hand_landmarks_style(),
-                    self.mp_drawing_styles.get_default_hand_connections_style())
+            # Only process the first detected hand
+            hand_landmarks = results.multi_hand_landmarks[0]
+            self.mp_drawing.draw_landmarks(
+                frame,
+                hand_landmarks,
+                self.mp_hands.HAND_CONNECTIONS,
+                self.mp_drawing_styles.get_default_hand_landmarks_style(),
+                self.mp_drawing_styles.get_default_hand_connections_style()
+            )
 
-                for i in range(len(hand_landmarks.landmark)):
-                    x = hand_landmarks.landmark[i].x
-                    y = hand_landmarks.landmark[i].y
-                    x_.append(x)
-                    y_.append(y)
+            for i in range(len(hand_landmarks.landmark)):
+                x = hand_landmarks.landmark[i].x
+                y = hand_landmarks.landmark[i].y
+                x_.append(x)
+                y_.append(y)
 
-                for i in range(0, 21):
-                    data_aux.append(x_[i] - min(x_))
-                    data_aux.append(y_[i] - min(y_))
+            for i in range(0, 21):
+                data_aux.append(x_[i] - min(x_))
+                data_aux.append(y_[i] - min(y_))
 
             if len(data_aux) == 42:
                 prediction = self.model.predict([np.asarray(data_aux)])
                 predicted_character = self.labels_dict.get(str(prediction[0]), 'Unknown')
 
-                # Unifier les gestes retournés et non retournés
+                # Unify similar gestures
                 if predicted_character in ['A', 'A-2']:
                     predicted_character = 'A'
                 elif predicted_character in ['B', 'B-2']:
@@ -77,9 +80,16 @@ class ReconnaissanceGestesTempsReel:
                 cv2.putText(frame, predicted_character, (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 0, 0), 3, cv2.LINE_AA)
             else:
-                print(f"Nombre de caractéristiques inattendu : {len(data_aux)}")
+                print(f"Unexpected feature count: {len(data_aux)}")
+
+        # Save latest prediction to be queried via API
+        self.last_prediction = predicted_character
 
         return {'predicted_character': predicted_character, 'frame': frame}
+
+    def get_last_prediction(self):
+        """Return the last predicted gesture character."""
+        return self.last_prediction
 
     def gen_frames(self):
         cap = cv2.VideoCapture(0)
@@ -95,4 +105,3 @@ class ReconnaissanceGestesTempsReel:
                 yield (b'--frame\r\n'
                        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         cap.release()
-        

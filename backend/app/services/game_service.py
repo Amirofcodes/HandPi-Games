@@ -12,6 +12,7 @@ class GameService:
             self.current_game = {
                 'score': 0,
                 'current_letter_index': 0,
+                # Allow flexible letter sets
                 'letters': ['A', 'B', 'C', 'D']
             }
             logger.info("Game started")
@@ -49,6 +50,7 @@ class GameService:
             self.current_game['current_letter_index'] += 1
             logger.info(f"Correct gesture. New score: {self.current_game['score']}")
 
+            # Check for game completion
             if self.current_game['current_letter_index'] == len(self.current_game['letters']):
                 logger.info("Game completed")
                 return self.end_game()
@@ -57,13 +59,16 @@ class GameService:
             return {
                 'message': 'Correct!',
                 'new_letter': new_letter,
-                'score': self.current_game['score']
+                'score': self.current_game['score'],
+                'predicted_gesture': gesture,
+                'expected_letter': expected_letter
             }
         else:
             logger.info(f"Incorrect gesture: {gesture}")
             return {
                 'message': 'Incorrect, try again',
                 'expected_letter': expected_letter,
+                'predicted_gesture': gesture,
                 'score': self.current_game['score']
             }
 

@@ -1,13 +1,13 @@
 from .reconnaissance_gestes_temps_reel import ReconnaissanceGestesTempsReel
 import os
 
-# Obtenir le chemin absolu du répertoire du fichier actuel
+# Get the absolute path to the current directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Construire le chemin vers model.p
+# Build the path to the model file
 model_path = os.path.join(current_dir, 'model.p')
 
-# Initialiser la reconnaissance de gestes avec le labels_dict mis à jour
+# Initialize gesture recognition with a unified labels dictionary
 reconnaissance_gestes = ReconnaissanceGestesTempsReel(
     model_path, 
     {

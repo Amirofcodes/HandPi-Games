@@ -1,26 +1,19 @@
-from flask import Blueprint, jsonify, Response, request
-import cv2
-import numpy as np
-import base64
-from app.models.user import get_reconnaissance_gestes
+from flask import Blueprint, Response
+from ..models.user import get_reconnaissance_gestes
 
-bp = Blueprint('general', __name__)
+api_general = Blueprint('api_general', __name__)
+reconnaissance_gestes = get_reconnaissance_gestes()
 
-@bp.route('/video_feed', methods=['GET'])
+@api_general.route('/video_feed', methods=['GET'])
 def video_feed():
-    # Get the frames from the camera feed and send them as a streaming response
-    return Response(get_reconnaissance_gestes().gen_frames(),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(reconnaissance_gestes.gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@bp.route('/check_gesture', methods=['POST'])
-def check_gesture():
-    image_data = request.json.get('gesture')
-    nparr = np.frombuffer(base64.b64decode(image_data.split(',')[1]), np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    reconnaissance_gestes = get_reconnaissance_gestes()
-    result = reconnaissance_gestes.traiter_frame(img)
-    return jsonify(result)
-
-@bp.route('/', methods=['GET'])
+@api_general.route('/', methods=['GET'])
 def home():
-    return jsonify({'message': 'Welcome to HandPi Games API'})
+    return '''<h1>HandPi Games Backend</h1><p>API is running...</p>''', 200
+
+@api_general.route('/predict', methods=['GET'])
+@api_general.route('/api/predict', methods=['GET'])
+def predict_gesture():
+    gesture = reconnaissance_gestes.get_last_prediction() if reconnaissance_gestes else 'Unknown'
+    return {'gesture': gesture}, 200

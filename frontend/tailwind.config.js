@@ -1,36 +1,21 @@
+// frontend/tailwind.config.js
+
+/** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./public/index.html", "./src/**/*.{js,jsx,ts,tsx}"],
+  content: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
   theme: {
-    extend: {
-      keyframes: {
-        blink: {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.5' },
-        }
+      extend: {
+          colors: {
+              primary: '#4f46e5',
+              secondary: '#6366f1',
+              accent: '#818cf8',
+              gradientStart: '#36FF6F',
+              gradientEnd: '#00A54F',
+          },
+          fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+          },
       },
-      animation: {
-        blink: 'blink 1.5s ease-in-out infinite',
-      },
-      maxWidth: {
-        46: "2.875 rem",
-        320: "1728px",
-      },
-      backgroundImage: {
-        "button-gradient": 'linear-gradient(90deg, #70DD4A 0%, #43B226 100%)',
-        "gradient-violet": 'linear-gradient(to right, #C0B7E8, #8176AF)',
-      },
-      colors: {
-        "custom-bg": "#302C42",
-        gradientStart: '#C0B7E8',
-        gradientEnd: '#8176AF',
-       "number-color": '#343045',
-       number: '#0D0D0D'
-      },
-    },
-    container: {
-      center: true,
-      padding: "2rem",
-    },
   },
   plugins: [],
 };

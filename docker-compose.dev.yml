@@ -1,0 +1,57 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: handpi-backend
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./backend:/app
+    devices:
+      - /dev/video0:/dev/video0
+    networks:
+      - handpi-dev-network
+    environment:
+      - FLASK_ENV=development
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+    container_name: handpi-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - handpi-dev-network
+    environment:
+      - NODE_ENV=development
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:alpine
+    container_name: handpi-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.production.conf:/etc/nginx/nginx.conf
+    networks:
+      - handpi-dev-network
+    depends_on:
+      - backend
+      - frontend
+
+networks:
+  handpi-dev-network:
+    driver: bridge
