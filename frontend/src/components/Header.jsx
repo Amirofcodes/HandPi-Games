@@ -2,61 +2,97 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     
     return (
-        <header className="bg-white shadow-smooth sticky top-0 z-50">
+        <header className="bg-dark/90 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50">
             <div className="container py-4">
                 <div className="flex items-center justify-between">
                     {/* Logo */}
                     <Link to="/" className="flex items-center space-x-2">
-                        <span className="text-2xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                        <motion.span 
+                            className="text-2xl font-extrabold heading-gradient"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                        >
                             HandPi
-                        </span>
-                        <span className="text-dark font-semibold">Games</span>
+                        </motion.span>
+                        <motion.span 
+                            className="text-white font-medium"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5, delay: 0.1 }}
+                        >
+                            Games
+                        </motion.span>
                     </Link>
                     
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center space-x-6">
-                        <Link to="/" className="text-dark hover:text-primary transition-colors font-medium">
-                            Home
-                        </Link>
-                        <Link to="/game" className="btn btn-primary">
-                            Play Now
-                        </Link>
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.1 }}
+                        >
+                            <Link to="/" className="text-white/80 hover:text-primary transition-colors font-medium">
+                                Home
+                            </Link>
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.2 }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            <Link to="/game" className="btn btn-primary">
+                                Play Now
+                            </Link>
+                        </motion.div>
                     </nav>
                     
                     {/* Mobile menu button */}
-                    <button 
-                        className="md:hidden text-dark"
+                    <motion.button 
+                        className="md:hidden text-white"
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                        whileTap={{ scale: 0.9 }}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
                         </svg>
-                    </button>
+                    </motion.button>
                 </div>
                 
                 {/* Mobile Navigation */}
                 {mobileMenuOpen && (
-                    <nav className="md:hidden pt-4 pb-2 border-t mt-4 space-y-3">
+                    <motion.nav 
+                        className="md:hidden pt-4 pb-2 border-t border-white/10 mt-4 space-y-3"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        transition={{ duration: 0.3 }}
+                    >
                         <Link 
                             to="/" 
-                            className="block py-2 text-dark hover:text-primary transition-colors"
+                            className="block py-2 text-white/80 hover:text-primary transition-colors"
                             onClick={() => setMobileMenuOpen(false)}
                         >
                             Home
                         </Link>
                         <Link 
                             to="/game" 
-                            className="block py-2 text-primary font-semibold hover:text-secondary transition-colors"
+                            className="block py-2 text-primary font-semibold hover:text-accent transition-colors"
                             onClick={() => setMobileMenuOpen(false)}
                         >
                             Play Now
                         </Link>
-                    </nav>
+                    </motion.nav>
                 )}
             </div>
         </header>
