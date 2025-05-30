@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: frontend:latest # Will be replaced by kustomize
+          image: ghcr.io/amirofcodes/handpi-frontend:latest
           ports:
             - containerPort: 80
           livenessProbe:

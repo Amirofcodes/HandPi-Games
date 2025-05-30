@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: router
-          image: router:latest # Will be replaced by kustomize
+          image: ghcr.io/amirofcodes/handpi-router:latest
           ports:
             - containerPort: 80
           livenessProbe:

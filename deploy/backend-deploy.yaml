@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: backend:latest # Will be replaced by kustomize
+          image: ghcr.io/amirofcodes/handpi-backend:latest
           ports:
             - containerPort: 5001
           env:
