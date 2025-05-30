@@ -226,3 +226,7 @@ codebase.md
 # Python virtual environments
 .venv/
 venv/
+
+# Cursor IDE specific files
+.cursor/
+.cursorignore

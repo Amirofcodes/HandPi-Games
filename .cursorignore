@@ -1,3 +1,0 @@
-# Un-ignore environment files (override the default ignore list and .gitignore)
-!.env
-!.env.*
