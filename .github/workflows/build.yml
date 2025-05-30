@@ -63,6 +63,7 @@ jobs:
           build-args: |
             VCS_REF=${{ github.sha }}
             BUILD_DATE=${{ needs.generate-tag.outputs.tag }}
+            ${{ matrix.service == 'frontend' && 'VITE_API_URL=https://handpigames.com/api' || '' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
