@@ -36,5 +36,3 @@ spec:
               port: 5001
             initialDelaySeconds: 15
             periodSeconds: 20
-      imagePullSecrets:
-        - name: ghcr-cred

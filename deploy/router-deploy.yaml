@@ -40,5 +40,3 @@ spec:
           emptyDir: {}
         - name: nginx-run
           emptyDir: {}
-      imagePullSecrets:
-        - name: ghcr-cred
