@@ -13,10 +13,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - handpi.yourdomain.com
+        - handpigames.com
       secretName: handpi-tls
   rules:
-    - host: handpi.yourdomain.com
+    - host: handpigames.com
       http:
         paths:
           - path: /

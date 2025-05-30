@@ -25,7 +25,7 @@ HandPi Games demonstrates AI/ML capabilities through an interactive web applicat
 
 ## Live Demo
 
-🚀 **[View Live Demo](https://handpi.yourdomain.com)** _(Update with your actual domain)_
+🚀 **[View Live Demo](https://handpigames.com)**
 
 ## Quick Start
 
@@ -37,7 +37,7 @@ HandPi Games demonstrates AI/ML capabilities through an interactive web applicat
 ### Running Locally
 
 ```bash
-git clone https://github.com/yourusername/HandPi-Games.git
+git clone https://github.com/Amirofcodes/HandPi-Games.git
 cd HandPi-Games
 cp compose/.env.example compose/.env
 cd compose && docker-compose up -d
