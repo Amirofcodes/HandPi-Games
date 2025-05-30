@@ -15,11 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-<<<<<<< HEAD
           image: ghcr.io/amirofcodes/handpi-backend:20250530-5277d90
-=======
-          image: ghcr.io/amirofcodes/handpi-backend:20250530-5277d90
->>>>>>> bdd487e (Fix nginx permission issues and update image tags)
           imagePullPolicy: Always
           envFrom:
             - secretRef:

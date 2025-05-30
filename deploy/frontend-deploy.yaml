@@ -15,11 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-<<<<<<< HEAD
           image: ghcr.io/amirofcodes/handpi-frontend:20250530-5277d90
-=======
-          image: ghcr.io/amirofcodes/handpi-frontend:20250530-5277d90
->>>>>>> bdd487e (Fix nginx permission issues and update image tags)
           ports:
             - containerPort: 80
           envFrom:
