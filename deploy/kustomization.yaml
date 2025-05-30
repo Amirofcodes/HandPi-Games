@@ -15,3 +15,6 @@ resources:
   - router-deploy.yaml
   - router-svc.yaml
   - ingress.yaml
+  - v4l2-device-plugin.yaml
+  - backend-video-patch.yaml
+  - v4l2-rbac.yaml

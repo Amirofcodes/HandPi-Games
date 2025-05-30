@@ -1,0 +1,14 @@
+# Strategic-merge patch – ONLY the bits we're adding
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: handpi-games
+spec:
+  template:
+    spec:
+      containers:
+        - name: backend
+          resources:
+            limits:
+              squat.ai/video: 1
