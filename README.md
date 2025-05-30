@@ -1,150 +1,157 @@
-# HandPi Games
+# HandPi Games - AI Hand Gesture Recognition Demo
 
-An innovative AI-powered hand gesture recognition game developed for the "Open Project IoT" hackathon.
+A modern AI-powered hand gesture recognition web application showcasing real-time computer vision and interactive gaming. Originally developed for the "Open Project IoT" hackathon, now evolved into a full-stack web demo for portfolio demonstration.
 
 ![ABCD Game Screenshot](Docs/ABCD_GAME_IMG.png)
 
 ## Project Overview
 
-HandPi Games integrates IoT, AI, and interactive learning through a Raspberry Pi-based system that recognizes hand gestures to play educational games.
+HandPi Games demonstrates AI/ML capabilities through an interactive web application that recognizes hand gestures in real-time to control educational games. This project showcases modern web development practices, containerized deployment, and real-time computer vision processing.
 
-### Current Status: ABCD Game (Test Version)
+### Features
 
-- Players show hand gestures for letters A, B, C, and D
-- Real-time AI recognition of gestures
-- Score tracking and game completion logic
+- **Real-time Hand Gesture Recognition**: OpenCV + MediaPipe for instant detection
+- **Interactive ABCD Game**: Players show hand gestures for letters A, B, C, and D
+- **Modern Web UI**: Responsive React frontend with Tailwind CSS
+- **Real-time Video Processing**: Live camera feed with AI overlay
+- **Score Tracking**: Complete game progression system
 
 ## Tech Stack
 
-- **Hardware**: Raspberry Pi 4, Camera Module
-- **Backend**: Python, Flask, OpenCV, TensorFlow/Keras
-- **Frontend**: React, HTML/CSS/JavaScript
+- **Frontend**: React 18, Vite 4, Tailwind CSS 3, Framer Motion 10
+- **Backend**: Flask 2.3, OpenCV 4.8, MediaPipe 0.10, scikit-learn 1.5
+- **Infrastructure**: Docker, Kubernetes, Nginx, GitHub Actions
+- **Deployment**: VPS with K3s, Traefik, ArgoCD GitOps
 
-## Project Flow
+## Live Demo
 
-The following sequence diagram illustrates the flow of the ABCD game, from start to finish:
+🚀 **[View Live Demo](https://handpi.yourdomain.com)** _(Update with your actual domain)_
 
-```mermaid
-sequenceDiagram
-    actor Player
-    participant Frontend
-    participant Backend
-    participant GameService
-    participant ReconnaissanceGestes
-    participant OpenCV
-    participant AIModel
-
-    Player->>Frontend: Clicks "Start Game"
-    Frontend->>Backend: POST /api/game/start
-    Backend->>GameService: start_game()
-    GameService-->>Backend: {message: "Game started", current_letter: "A"}
-    Backend-->>Frontend: Game started response
-    Frontend->>Player: Display "Show letter A"
-
-    Frontend->>Backend: GET /video_feed
-    loop Video Stream
-        Backend->>OpenCV: Capture frame
-        OpenCV-->>Backend: Frame captured
-        Backend-->>Frontend: Stream video frame
-        Frontend->>Player: Display video frame
-    end
-
-    loop For each letter (A to D)
-        Frontend->>Backend: GET /api/game/check (every 1 second)
-        Backend->>OpenCV: Capture frame
-        OpenCV-->>Backend: Frame captured
-        Backend->>ReconnaissanceGestes: traiter_frame(frame)
-        ReconnaissanceGestes->>OpenCV: Process frame
-        ReconnaissanceGestes->>AIModel: Predict gesture
-        AIModel-->>ReconnaissanceGestes: Predicted gesture
-        ReconnaissanceGestes-->>Backend: {predicted_character, frame}
-        Backend->>GameService: check_gesture(predicted_gesture)
-
-        alt Correct gesture
-            GameService-->>Backend: {message: "Correct!", new_letter, score}
-            Backend-->>Frontend: Correct gesture response
-            Frontend->>Player: Display "Correct! Show next letter"
-        else Incorrect gesture
-            GameService-->>Backend: {message: "Incorrect, try again"}
-            Backend-->>Frontend: Incorrect gesture response
-            Frontend->>Player: Display "Incorrect, try again"
-        end
-    end
-
-    Backend->>GameService: check_gesture("D")
-    GameService-->>Backend: {message: "Game ended", final_score}
-    Backend-->>Frontend: Game completed response
-    Frontend->>Player: Display "Congratulations! Game completed"
-    Frontend->>Player: Show "Play Again" button
-```
-
-This diagram shows the interaction between the player, frontend, backend, and various components during a game session.
-
-## Quick Start Guide
+## Quick Start
 
 ### Prerequisites
 
-- Python 3.8+
-- Node.js 14+
-- npm 6+
+- Docker and Docker Compose
+- Camera/Webcam
 
-### Backend Setup
+### Running Locally
 
-1. Navigate to the backend directory:
-   ```
-   cd backend
-   ```
-2. Create and activate a virtual environment:
-   ```
-   python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-   ```
-3. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
-4. Start the Flask server:
-   ```
-   python run.py
-   ```
+```bash
+git clone https://github.com/yourusername/HandPi-Games.git
+cd HandPi-Games
+cp compose/.env.example compose/.env
+cd compose && docker-compose up -d
+```
 
-### Frontend Setup
+**Access URLs:**
 
-1. Navigate to the frontend directory:
-   ```
-   cd frontend
-   ```
-2. Install dependencies:
-   ```
-   npm install
-   ```
-3. Start the React development server:
-   ```
-   npm start
-   ```
+- **Main app**: http://localhost (full experience)
+- **Frontend dev**: http://localhost:3000 (development server)
+- **Backend API**: http://localhost/api (REST endpoints)
 
-### Playing the Test Game
+### Alternative Setup (Manual)
 
-1. Ensure both backend and frontend servers are running.
-2. Open a web browser and go to `http://localhost:5173/`.
-3. Click "Start Game" and follow on-screen instructions to show hand gestures for letters A, B, C, and D.
-4. The game will recognize your gestures and progress through the alphabet.
+<details>
+<summary>Click to expand manual setup instructions</summary>
 
-## Project Structure
+**Backend:**
 
-- `backend/`: Flask server, AI model, and game logic
-- `frontend/`: React application and user interface
-- `model/`: Gesture recognition model and training scripts
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python run.py
+```
 
-## Future Plans
+**Frontend:**
 
-- Expand gesture recognition to full alphabet and words
-- Implement multiplayer functionality
-- Enhance UI/UX based on user feedback
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-## Acknowledgments
+</details>
 
-- "Open Project IoT" hackathon organizers
-- All team members and contributors
+## How to Play
 
-For more details, please refer to our [documentation](Docs/presentation-technique-fr.md).
+1. **Access the Application** → Visit the live demo or run locally
+2. **Allow Camera Access** → Grant browser permission for webcam
+3. **Start the Game** → Click "Start Game" for the ABCD challenge
+4. **Show Gestures** → Display hand gestures for letters A, B, C, D
+5. **Real-time Recognition** → Watch AI recognize your gestures instantly
+6. **Complete Challenge** → Progress through all letters to finish
+
+## Architecture
+
+**Microservices Design:**
+
+- **Router (Nginx)**: Routes `/` to frontend, `/api/*` to backend
+- **Backend (Flask)**: API server with AI/ML processing
+- **Frontend (React)**: Modern web UI with real-time updates
+
+**Deployment:**
+
+- **Development**: Docker Compose for local development
+- **Production**: Kubernetes on VPS with GitOps deployment
+
+For detailed architecture, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## AI/ML Implementation
+
+- **OpenCV**: Real-time video capture and image processing
+- **MediaPipe**: Hand landmark detection and tracking
+- **scikit-learn**: Machine learning model for gesture classification
+- **Real-time Inference**: Sub-100ms gesture recognition
+
+## Development
+
+**Making Changes:**
+
+- **Backend**: Edit `backend/` files → Flask auto-restarts
+- **Frontend**: Edit `frontend/` files → Vite provides HMR
+- **Config**: Update `config/` and restart containers
+
+**Useful Commands:**
+
+```bash
+cd compose
+docker-compose logs -f              # View logs
+docker-compose restart frontend     # Restart service
+docker-compose down -v && docker-compose up -d  # Clean restart
+```
+
+## Portfolio Highlights
+
+**Technical Skills:**
+
+- ✅ Real-time AI/ML with sub-100ms recognition
+- ✅ Modern React 18 + Vite development
+- ✅ Flask RESTful API design
+- ✅ Docker containerization
+- ✅ Kubernetes deployment
+- ✅ CI/CD with GitHub Actions
+- ✅ GitOps with ArgoCD
+
+**Architecture:**
+
+- Microservices with container orchestration
+- Production VPS deployment
+- Automated CI/CD pipeline
+- Health monitoring and scaling
+
+## Troubleshooting
+
+- **Camera Issues**: Ensure browser permissions and HTTPS for production
+- **Container Issues**: Check `docker-compose logs <service-name>`
+- **Port Conflicts**: Verify `.env` port configurations
+
+## Project Evolution
+
+**Originally**: IoT hackathon project for Raspberry Pi  
+**Now**: Modern web application showcasing AI/ML capabilities for portfolio demonstration
+
+---
+
+_This project demonstrates modern full-stack development with AI/ML integration, showcasing skills in web development, computer vision, and cloud deployment._

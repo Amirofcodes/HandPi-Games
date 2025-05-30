@@ -6,17 +6,17 @@ module.exports = {
   theme: {
       extend: {
           colors: {
-              primary: '#6366f1',
+              primary: '#22c55e',
               secondary: '#4f46e5',
-              accent: '#a78bfa',
+              accent: '#16a34a',
               accent2: '#f43f5e',
-              dark: '#0f172a',
-              darker: '#070b14',
-              light: '#f8fafc',
+              dark: '#101112',
+              darker: '#090a0b',
+              light: '#f3f4f6',
               neutral: '#141e33',
               surface: '#0f172a',
-              card: '#0c1425',
-              cardLight: '#141e33',
+              card: '#181c1f',
+              cardLight: '#23272b',
               gradientStart: '#8b5cf6',
               gradientEnd: '#3b82f6',
           },
@@ -30,6 +30,8 @@ module.exports = {
               'glow-accent': '0 0 15px rgba(167, 139, 250, 0.5)',
               'glow-red': '0 0 15px rgba(244, 63, 94, 0.5)',
               'inner-glow': 'inset 0 0 15px rgba(99, 102, 241, 0.2)',
+              'glow-green': '0 0 16px 0 #22c55e55',
+              'glass': '0 4px 32px 0 rgba(34,197,94,0.12)',
           },
           borderRadius: {
               'xl': '1rem',

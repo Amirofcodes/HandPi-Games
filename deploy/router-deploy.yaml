@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: router
+  namespace: handpi-games
+  labels:
+    app: handpi
+    component: router
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: handpi
+      component: router
+  template:
+    metadata:
+      labels:
+        app: handpi
+        component: router
+    spec:
+      containers:
+        - name: router
+          image: router:latest # Will be replaced by kustomize
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 101 # nginx user
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE

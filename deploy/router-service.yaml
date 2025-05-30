@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: router
+  namespace: handpi-games
+  labels:
+    app: handpi
+    component: router
+spec:
+  selector:
+    app: handpi
+    component: router
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  type: ClusterIP

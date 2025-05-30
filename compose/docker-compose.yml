@@ -1,0 +1,70 @@
+networks:
+  app_network:
+    driver: bridge
+    name: ${PROJECT_NAME:-handpi}_network
+
+services:
+  router:
+    build:
+      context: ..
+      dockerfile: docker/router/Dockerfile
+    container_name: ${PROJECT_NAME:-handpi}-router
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - app_network
+    ports:
+      - "${ROUTER_PORT:-80}:80"
+    volumes:
+      - ../config/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/backend/Dockerfile
+    container_name: ${PROJECT_NAME:-handpi}-backend
+    environment:
+      - FLASK_ENV=${FLASK_ENV:-development}
+      - FLASK_DEBUG=${FLASK_DEBUG:-1}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
+    networks:
+      - app_network
+    volumes:
+      - ../backend:/app # Hot reload for development
+    ports:
+      - "${BACKEND_PORT:-5001}:5001"
+    devices:
+      - /dev/video0:/dev/video0 # Camera access
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/frontend/Dockerfile
+    container_name: ${PROJECT_NAME:-handpi}-frontend
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - VITE_API_URL=${VITE_API_URL:-http://localhost/api}
+    networks:
+      - app_network
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules # Prevent overwriting node_modules
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  db_data:
