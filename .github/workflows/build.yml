@@ -9,8 +9,19 @@ env:
   IMAGE_PREFIX: amirofcodes/handpi
 
 jobs:
+  # ---------- generate tag ----------
+  generate-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - name: Set image tag
+        id: tag
+        run: echo "tag=$(date +%Y%m%d)-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
   # ---------- build & push images ----------
   build:
+    needs: generate-tag
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -18,8 +29,6 @@ jobs:
     strategy:
       matrix:
         service: [backend, frontend, router]
-    outputs:
-      tag: ${{ steps.tag.outputs.tag }} # pass to next job
     steps:
       - uses: actions/checkout@v4
 
@@ -32,10 +41,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set image tag
-        id: tag
-        run: echo "tag=$(date +%Y%m%d)-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - name: Extract metadata
         id: meta
@@ -53,17 +58,17 @@ jobs:
           file: ./docker/${{ matrix.service }}/Dockerfile.prod
           push: true
           tags: |
-            ghcr.io/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ steps.tag.outputs.tag }}
+            ghcr.io/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ needs.generate-tag.outputs.tag }}
             ghcr.io/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:latest
           build-args: |
             VCS_REF=${{ github.sha }}
-            BUILD_DATE=${{ steps.tag.outputs.tag }}
+            BUILD_DATE=${{ needs.generate-tag.outputs.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   # ---------- update manifests for ArgoCD ----------
   update-manifests:
-    needs: build
+    needs: [generate-tag, build]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -76,7 +81,7 @@ jobs:
 
       - name: Update deployment manifests
         env:
-          TAG: ${{ needs.build.outputs.tag }}
+          TAG: ${{ needs.generate-tag.outputs.tag }}
         run: |
           set -e
           echo "Updating image tags to ${TAG}"
@@ -85,23 +90,49 @@ jobs:
           for service in backend frontend router; do
             deployment_file="deploy/${service}-deploy.yaml"
             if [[ -f "$deployment_file" ]]; then
-              sed -i "s|ghcr.io/amirofcodes/handpi-${service}:.*|ghcr.io/amirofcodes/handpi-${service}:${TAG}|" "$deployment_file"
-              echo "Updated ${deployment_file}"
+              # More robust sed replacement
+              sed -i "s|ghcr\.io/amirofcodes/handpi-${service}:[^[:space:]]*|ghcr.io/amirofcodes/handpi-${service}:${TAG}|" "$deployment_file"
+              echo "Updated ${deployment_file} with tag ${TAG}"
+              
+              # Verify the update worked
+              if grep -q "ghcr.io/amirofcodes/handpi-${service}:${TAG}" "$deployment_file"; then
+                echo "✅ Successfully updated $service image tag"
+              else
+                echo "❌ Failed to update $service image tag"
+                exit 1
+              fi
+            else
+              echo "❌ Deployment file not found: $deployment_file"
+              exit 1
             fi
           done
 
+          # Show what changed
+          echo "=== Changes made ==="
+          git diff deploy/
+
       - name: Commit and push updates
         env:
-          TAG: ${{ needs.build.outputs.tag }}
+          TAG: ${{ needs.generate-tag.outputs.tag }}
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-          git add deploy/*.yaml
+          git add deploy/
 
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "ci: update deployment image tags to ${TAG} [skip ci]"
+            git commit -m "ci: update deployment image tags to ${TAG}
+
+            Updated image tags:
+            - handpi-backend:${TAG}
+            - handpi-frontend:${TAG} 
+            - handpi-router:${TAG}
+            
+            [skip ci]"
+            
+            echo "Pushing changes..."
             git push
+            echo "✅ Successfully pushed updated manifests"
           fi
