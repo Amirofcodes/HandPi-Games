@@ -4,7 +4,7 @@ metadata:
   name: frontend
   namespace: handpi-games
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: frontend
@@ -15,13 +15,27 @@ spec:
     spec:
       containers:
         - name: frontend
+<<<<<<< HEAD
           image: ghcr.io/amirofcodes/handpi-frontend:20250530-7df3930
+=======
+          image: ghcr.io/amirofcodes/handpi-frontend:20250530-d4a2d9b
+>>>>>>> bdd487e (Fix nginx permission issues and update image tags)
           ports:
             - containerPort: 80
           envFrom:
             - configMapRef:
                 name: handpi-config
           imagePullPolicy: Always
+          securityContext:
+            runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+          volumeMounts:
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
           readinessProbe:
             httpGet:
               path: /
@@ -34,5 +48,10 @@ spec:
               port: 80
             initialDelaySeconds: 15
             periodSeconds: 20
+      volumes:
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
       imagePullSecrets:
         - name: ghcr-cred

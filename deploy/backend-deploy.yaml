@@ -4,7 +4,7 @@ metadata:
   name: backend
   namespace: handpi-games
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: backend
@@ -15,7 +15,11 @@ spec:
     spec:
       containers:
         - name: backend
+<<<<<<< HEAD
           image: ghcr.io/amirofcodes/handpi-backend:20250530-7df3930
+=======
+          image: ghcr.io/amirofcodes/handpi-backend:20250530-d4a2d9b
+>>>>>>> bdd487e (Fix nginx permission issues and update image tags)
           imagePullPolicy: Always
           envFrom:
             - secretRef:

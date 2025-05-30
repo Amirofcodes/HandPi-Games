@@ -4,7 +4,7 @@ metadata:
   name: router
   namespace: handpi-games
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: router
@@ -15,16 +15,34 @@ spec:
     spec:
       containers:
         - name: router
+<<<<<<< HEAD
           image: ghcr.io/amirofcodes/handpi-router:20250530-7df3930
+=======
+          image: ghcr.io/amirofcodes/handpi-router:20250530-d4a2d9b
+>>>>>>> bdd487e (Fix nginx permission issues and update image tags)
           ports:
             - containerPort: 80
+          securityContext:
+            runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
           volumeMounts:
             - name: nginx-config
               mountPath: /etc/nginx/conf.d/default.conf
               subPath: default.conf
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
+          imagePullPolicy: Always
       volumes:
         - name: nginx-config
           configMap:
             name: router-config
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
       imagePullSecrets:
         - name: ghcr-cred
