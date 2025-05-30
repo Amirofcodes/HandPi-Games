@@ -17,11 +17,11 @@ resources:
 
 images:
   - name: backend
-    newName: ghcr.io/yourusername/handpi-backend
+    newName: ghcr.io/amirofcodes/handpi-backend
     newTag: latest
   - name: frontend
-    newName: ghcr.io/yourusername/handpi-frontend
+    newName: ghcr.io/amirofcodes/handpi-frontend
     newTag: latest
   - name: router
-    newName: ghcr.io/yourusername/handpi-router
+    newName: ghcr.io/amirofcodes/handpi-router
     newTag: latest

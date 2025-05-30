@@ -3,6 +3,8 @@ import pickle
 import cv2
 import mediapipe as mp
 import numpy as np
+import os
+import base64
 
 warnings.filterwarnings("ignore", category=UserWarning, module="google.protobuf.symbol_database")
 
@@ -12,6 +14,8 @@ class ReconnaissanceGestesTempsReel:
         self.labels_dict = labels_dict
         self.configurer_mediapipe()
         self.last_prediction: str = 'Unknown'
+        self.is_production = os.getenv('FLASK_ENV') == 'production'
+        self.latest_frame = None
 
     def charger_modele(self, chemin_modele: str):
         with open(chemin_modele, 'rb') as f:
@@ -23,6 +27,21 @@ class ReconnaissanceGestesTempsReel:
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_drawing_styles = mp.solutions.drawing_styles
         self.hands = self.mp_hands.Hands(static_image_mode=True, min_detection_confidence=0.3)
+
+    def process_frame_from_frontend(self, frame_data):
+        """Process base64 frame data sent from frontend in production mode."""
+        try:
+            # Decode base64 frame
+            frame_bytes = base64.b64decode(frame_data.split(',')[1])
+            nparr = np.frombuffer(frame_bytes, np.uint8)
+            frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            
+            result = self.traiter_frame(frame)
+            self.latest_frame = result['frame']
+            return result
+        except Exception as e:
+            print(f"Error processing frame from frontend: {e}")
+            return {'predicted_character': 'Unknown', 'frame': None}
 
     def traiter_frame(self, frame):
         data_aux = []
@@ -92,16 +111,36 @@ class ReconnaissanceGestesTempsReel:
         return self.last_prediction
 
     def gen_frames(self):
-        cap = cv2.VideoCapture(0)
-        while True:
-            success, frame = cap.read()
-            if not success:
-                break
-            else:
-                result = self.traiter_frame(frame)
-                frame = result['frame']
-                ret, buffer = cv2.imencode('.jpg', frame)
-                frame = buffer.tobytes()
-                yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        cap.release()
+        """Generate frames - different behavior for development vs production."""
+        if self.is_production:
+            # In production, serve the latest processed frame or a placeholder
+            while True:
+                if self.latest_frame is not None:
+                    ret, buffer = cv2.imencode('.jpg', self.latest_frame)
+                    frame = buffer.tobytes()
+                    yield (b'--frame\r\n'
+                           b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                else:
+                    # Serve a placeholder frame
+                    placeholder = np.zeros((480, 640, 3), dtype=np.uint8)
+                    cv2.putText(placeholder, 'Waiting for camera...', (50, 240),
+                              cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                    ret, buffer = cv2.imencode('.jpg', placeholder)
+                    frame = buffer.tobytes()
+                    yield (b'--frame\r\n'
+                           b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        else:
+            # Development mode: direct camera access
+            cap = cv2.VideoCapture(0)
+            while True:
+                success, frame = cap.read()
+                if not success:
+                    break
+                else:
+                    result = self.traiter_frame(frame)
+                    frame = result['frame']
+                    ret, buffer = cv2.imencode('.jpg', frame)
+                    frame = buffer.tobytes()
+                    yield (b'--frame\r\n'
+                           b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            cap.release()
