@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: router
-          image: ghcr.io/amirofcodes/handpi-router:latest
+          image: ghcr.io/amirofcodes/handpi-router:20250530-d4a2d9b
           ports:
             - containerPort: 80
           livenessProbe:

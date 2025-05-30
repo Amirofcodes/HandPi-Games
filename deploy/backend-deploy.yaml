@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ghcr.io/amirofcodes/handpi-backend:latest
+          image: ghcr.io/amirofcodes/handpi-backend:20250530-d4a2d9b
           ports:
             - containerPort: 5001
           env:
