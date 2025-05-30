@@ -18,6 +18,7 @@ spec:
           image: ghcr.io/amirofcodes/handpi-router:20250530-20069c9
           ports:
             - containerPort: 80
+            - containerPort: 443
           securityContext:
             runAsUser: 101
             runAsGroup: 101
@@ -31,6 +32,12 @@ spec:
               mountPath: /var/cache/nginx
             - name: nginx-run
               mountPath: /var/run
+            - name: tls-certs
+              mountPath: /etc/ssl/certs
+              readOnly: true
+            - name: tls-private
+              mountPath: /etc/ssl/private
+              readOnly: true
           imagePullPolicy: Always
       volumes:
         - name: nginx-config
@@ -40,3 +47,15 @@ spec:
           emptyDir: {}
         - name: nginx-run
           emptyDir: {}
+        - name: tls-certs
+          secret:
+            secretName: handpi-tls
+            items:
+              - key: tls.crt
+                path: tls.crt
+        - name: tls-private
+          secret:
+            secretName: handpi-tls
+            items:
+              - key: tls.key
+                path: tls.key

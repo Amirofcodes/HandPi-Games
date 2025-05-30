@@ -5,9 +5,32 @@ metadata:
   namespace: handpi-games
 data:
   default.conf: |
+    # HTTP server - redirect to HTTPS
     server {
         listen 80;
         server_name handpigames.com;
+        
+        # Redirect all HTTP traffic to HTTPS
+        return 301 https://$server_name$request_uri;
+    }
+
+    # HTTPS server
+    server {
+        listen 443 ssl;
+        server_name handpigames.com;
+        
+        # SSL configuration
+        ssl_certificate /etc/ssl/certs/tls.crt;
+        ssl_certificate_key /etc/ssl/private/tls.key;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers HIGH:!aNULL:!MD5;
+        
+        # Security headers for camera access
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        add_header X-Frame-Options DENY always;
+        add_header X-Content-Type-Options nosniff always;
+        add_header Referrer-Policy strict-origin-when-cross-origin always;
+        add_header Permissions-Policy "camera=*, microphone=*, geolocation=()";
 
         # Frontend React app – proxy to frontend container on port 80
         location / {
@@ -16,7 +39,7 @@ data:
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Proto https;
             
             proxy_connect_timeout 60s;
             proxy_send_timeout 60s;
@@ -30,7 +53,7 @@ data:
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Proto https;
             
             # Video streaming specific headers
             proxy_buffering off;
