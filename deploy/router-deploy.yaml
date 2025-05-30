@@ -3,51 +3,28 @@ kind: Deployment
 metadata:
   name: router
   namespace: handpi-games
-  labels:
-    app: handpi
-    component: router
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: handpi
-      component: router
+      app: router
   template:
     metadata:
       labels:
-        app: handpi
-        component: router
+        app: router
     spec:
       containers:
         - name: router
           image: ghcr.io/amirofcodes/handpi-router:20250530-d4a2d9b
           ports:
             - containerPort: 80
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 10
-            periodSeconds: 30
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          resources:
-            requests:
-              memory: "64Mi"
-              cpu: "50m"
-            limits:
-              memory: "128Mi"
-              cpu: "100m"
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            runAsUser: 101 # nginx user
-            capabilities:
-              drop:
-                - ALL
-              add:
-                - NET_BIND_SERVICE
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: router-config
+      imagePullSecrets:
+        - name: ghcr-cred

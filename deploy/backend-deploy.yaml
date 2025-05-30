@@ -3,80 +3,38 @@ kind: Deployment
 metadata:
   name: backend
   namespace: handpi-games
-  labels:
-    app: handpi
-    component: backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: handpi
-      component: backend
+      app: backend
   template:
     metadata:
       labels:
-        app: handpi
-        component: backend
+        app: backend
     spec:
       containers:
         - name: backend
           image: ghcr.io/amirofcodes/handpi-backend:20250530-d4a2d9b
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: handpi-secrets
+            - configMapRef:
+                name: handpi-config
           ports:
             - containerPort: 5001
-          env:
-            - name: FLASK_ENV
-              valueFrom:
-                configMapKeyRef:
-                  name: handpi-config
-                  key: FLASK_ENV
-            - name: LOG_LEVEL
-              valueFrom:
-                configMapKeyRef:
-                  name: handpi-config
-                  key: LOG_LEVEL
-            - name: CORS_ALLOWED_ORIGINS
-              valueFrom:
-                configMapKeyRef:
-                  name: handpi-config
-                  key: CORS_ALLOWED_ORIGINS
-            - name: SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: handpi-secrets
-                  key: SECRET_KEY
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: handpi-secrets
-                  key: JWT_SECRET
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: handpi-secrets
-                  key: DATABASE_URL
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 5001
-            initialDelaySeconds: 30
-            periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /healthz
               port: 5001
             initialDelaySeconds: 5
             periodSeconds: 10
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            runAsUser: 1000
-            capabilities:
-              drop:
-                - ALL
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5001
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      imagePullSecrets:
+        - name: ghcr-cred

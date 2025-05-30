@@ -1,16 +1,12 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: handpi-ingress
+  name: handpi-router
   namespace: handpi-games
-  labels:
-    app: handpi
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-production
 spec:
-  ingressClassName: traefik
   tls:
     - hosts:
         - handpigames.com

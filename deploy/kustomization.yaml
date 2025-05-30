@@ -7,21 +7,11 @@ resources:
   - namespace.yaml
   - configmap.yaml
   - secret.yaml
+  - router-configmap.yaml
   - backend-deploy.yaml
-  - backend-service.yaml
+  - backend-svc.yaml
   - frontend-deploy.yaml
-  - frontend-service.yaml
+  - frontend-svc.yaml
   - router-deploy.yaml
-  - router-service.yaml
+  - router-svc.yaml
   - ingress.yaml
-
-images:
-  - name: backend
-    newName: ghcr.io/amirofcodes/handpi-backend
-    newTag: latest
-  - name: frontend
-    newName: ghcr.io/amirofcodes/handpi-frontend
-    newTag: latest
-  - name: router
-    newName: ghcr.io/amirofcodes/handpi-router
-    newTag: latest

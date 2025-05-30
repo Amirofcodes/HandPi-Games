@@ -3,15 +3,9 @@ kind: Service
 metadata:
   name: frontend
   namespace: handpi-games
-  labels:
-    app: handpi
-    component: frontend
 spec:
   selector:
-    app: handpi
-    component: frontend
+    app: frontend
   ports:
     - port: 80
       targetPort: 80
-      protocol: TCP
-  type: ClusterIP

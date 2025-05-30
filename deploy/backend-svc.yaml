@@ -3,15 +3,9 @@ kind: Service
 metadata:
   name: backend
   namespace: handpi-games
-  labels:
-    app: handpi
-    component: backend
 spec:
   selector:
-    app: handpi
-    component: backend
+    app: backend
   ports:
     - port: 5001
       targetPort: 5001
-      protocol: TCP
-  type: ClusterIP

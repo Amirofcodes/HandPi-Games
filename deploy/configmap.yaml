@@ -4,8 +4,5 @@ metadata:
   name: handpi-config
   namespace: handpi-games
 data:
-  FLASK_ENV: "production"
   NODE_ENV: "production"
-  LOG_LEVEL: "INFO"
-  CORS_ALLOWED_ORIGINS: "https://handpigames.com"
   VITE_API_URL: "https://handpigames.com/api"

@@ -3,51 +3,36 @@ kind: Deployment
 metadata:
   name: frontend
   namespace: handpi-games
-  labels:
-    app: handpi
-    component: frontend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: handpi
-      component: frontend
+      app: frontend
   template:
     metadata:
       labels:
-        app: handpi
-        component: frontend
+        app: frontend
     spec:
       containers:
         - name: frontend
           image: ghcr.io/amirofcodes/handpi-frontend:20250530-d4a2d9b
           ports:
             - containerPort: 80
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 30
-            periodSeconds: 30
+          envFrom:
+            - configMapRef:
+                name: handpi-config
+          imagePullPolicy: Always
           readinessProbe:
             httpGet:
               path: /
               port: 80
             initialDelaySeconds: 5
             periodSeconds: 10
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "256Mi"
-              cpu: "200m"
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            runAsUser: 101 # nginx user
-            capabilities:
-              drop:
-                - ALL
-              add:
-                - NET_BIND_SERVICE
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      imagePullSecrets:
+        - name: ghcr-cred
