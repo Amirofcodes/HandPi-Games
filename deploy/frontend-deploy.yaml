@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/amirofcodes/handpi-frontend:20250530-a79244c
+          image: ghcr.io/amirofcodes/handpi-frontend:20250530-2638dad
           ports:
             - containerPort: 80
           envFrom:
