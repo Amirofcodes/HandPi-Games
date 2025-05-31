@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portfolio-spa
+  namespace: portfolio-spa
+  labels:
+    app: portfolio-spa
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: portfolio-spa
+  template:
+    metadata:
+      labels:
+        app: portfolio-spa
+    spec:
+      containers:
+        - name: portfolio-spa
+          image: ghcr.io/amirofcodes/handpi-portfolio-spa:latest
+          ports:
+            - containerPort: 80

@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: handpi-router
-  namespace: handpi-games
+  name: portfolio-spa-ingress
+  namespace: portfolio-spa
   annotations:
     kubernetes.io/ingress.class: traefik
     cert-manager.io/cluster-issuer: letsencrypt-production
@@ -19,6 +19,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: router
+                name: portfolio-spa
                 port:
                   number: 80

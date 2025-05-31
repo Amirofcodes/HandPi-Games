@@ -1,20 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: handpi-games
+  name: handpi-portfolio-spa
   namespace: argocd
 spec:
-  destination:
-    namespace: handpi-games
-    server: https://kubernetes.default.svc
   project: default
   source:
-    path: deploy
     repoURL: https://github.com/Amirofcodes/HandPi-Games.git
-    targetRevision: main
+    targetRevision: docs/portfolio-spa
+    path: deploy
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: portfolio-spa
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true

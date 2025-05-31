@@ -1,36 +1,21 @@
-name: Build & Push HandPi Images
+name: Build & Deploy Portfolio SPA
 
 on:
   push:
-    branches: [main]
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_PREFIX: amirofcodes/handpi
+    branches:
+      - docs/portfolio-spa
 
 jobs:
-  # ---------- generate tag ----------
-  generate-tag:
-    runs-on: ubuntu-latest
-    outputs:
-      tag: ${{ steps.tag.outputs.tag }}
-    steps:
-      - name: Set image tag
-        id: tag
-        run: echo "tag=$(date +%Y%m%d)-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
-
-  # ---------- build & push images ----------
-  build:
-    needs: generate-tag
+  build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      packages: write
       contents: read
-    strategy:
-      matrix:
-        service: [backend, frontend, router]
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -40,100 +25,44 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix={{date 'YYYYMMDD'}}-
+      - name: Set image tag
+        id: tag
+        run: |
+          echo "tag=$(date +%Y%m%d)-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
-      - name: Build and push image
+      - name: Build & push SPA image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./docker/${{ matrix.service }}/Dockerfile.prod
+          context: docs/portfolio-spa
+          file: docs/portfolio-spa/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ needs.generate-tag.outputs.tag }}
-            ghcr.io/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:latest
-          build-args: |
-            VCS_REF=${{ github.sha }}
-            BUILD_DATE=${{ needs.generate-tag.outputs.tag }}
-            ${{ matrix.service == 'frontend' && 'VITE_API_URL=https://handpigames.com/api' || '' }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+            ghcr.io/amirofcodes/handpi-portfolio-spa:${{ steps.tag.outputs.tag }}
+            ghcr.io/amirofcodes/handpi-portfolio-spa:latest
 
-  # ---------- update manifests for ArgoCD ----------
-  update-manifests:
-    needs: [generate-tag, build]
+  update-manifest:
+    needs: build-and-push
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/docs/portfolio-spa'
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Update deployment manifests
-        env:
-          TAG: ${{ needs.generate-tag.outputs.tag }}
+      - name: Update SPA image tag in portfolio-deploy.yaml
         run: |
-          set -e
-          echo "Updating image tags to ${TAG}"
+          TAG=${{ needs.build-and-push.outputs.tag }}
+          # Replace the image line in deploy/portfolio-deploy.yaml
+          sed -i "s|ghcr.io/amirofcodes/handpi-portfolio-spa:[^[:space:]]*|ghcr.io/amirofcodes/handpi-portfolio-spa:${TAG}|" deploy/portfolio-deploy.yaml
+          echo "Updated portfolio-deploy.yaml with tag ${TAG}"
 
-          # Update all deployment files
-          for service in backend frontend router; do
-            deployment_file="deploy/${service}-deploy.yaml"
-            if [[ -f "$deployment_file" ]]; then
-              # More robust sed replacement
-              sed -i "s|ghcr\.io/amirofcodes/handpi-${service}:[^[:space:]]*|ghcr.io/amirofcodes/handpi-${service}:${TAG}|" "$deployment_file"
-              echo "Updated ${deployment_file} with tag ${TAG}"
-              
-              # Verify the update worked
-              if grep -q "ghcr.io/amirofcodes/handpi-${service}:${TAG}" "$deployment_file"; then
-                echo "✅ Successfully updated $service image tag"
-              else
-                echo "❌ Failed to update $service image tag"
-                exit 1
-              fi
-            else
-              echo "❌ Deployment file not found: $deployment_file"
-              exit 1
-            fi
-          done
-
-          # Show what changed
-          echo "=== Changes made ==="
-          git diff deploy/
-
-      - name: Commit and push updates
-        env:
-          TAG: ${{ needs.generate-tag.outputs.tag }}
+      - name: Commit & push updated manifest
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-
-          git add deploy/
-
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "ci: update deployment image tags to ${TAG}
-
-            Updated image tags:
-            - handpi-backend:${TAG}
-            - handpi-frontend:${TAG} 
-            - handpi-router:${TAG}
-            
-            [skip ci]"
-            
-            echo "Pushing changes..."
-            git push
-            echo "✅ Successfully pushed updated manifests"
-          fi
+          git add deploy/portfolio-deploy.yaml
+          git commit -m "ci: bump portfolio-spa image to $TAG" || echo "No changes to commit"
+          git push
