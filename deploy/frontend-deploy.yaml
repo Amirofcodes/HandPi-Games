@@ -13,15 +13,17 @@ spec:
       labels:
         app: frontend
     spec:
+      imagePullSecrets:
+        - name: ghcr-cred
       containers:
         - name: frontend
-          image: ghcr.io/amirofcodes/handpi-frontend:20250602-664dd4b
+          image: ghcr.io/amirofcodes/handpi-frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           envFrom:
             - configMapRef:
                 name: handpi-config
-          imagePullPolicy: Always
           securityContext:
             runAsUser: 101
             runAsGroup: 101

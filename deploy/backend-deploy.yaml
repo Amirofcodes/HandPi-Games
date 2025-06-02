@@ -13,6 +13,8 @@ spec:
       labels:
         app: backend
     spec:
+      imagePullSecrets:
+        - name: ghcr-cred
       containers:
         - name: backend
           image: ghcr.io/amirofcodes/handpi-backend:20250602-664dd4b
