@@ -9,8 +9,6 @@ spec:
     repoURL: https://github.com/Amirofcodes/HandPi-Games.git
     targetRevision: main
     path: deploy
-    directory:
-      recurse: true
   destination:
     server: https://kubernetes.default.svc
     namespace: handpi-games
@@ -20,11 +18,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - PruneLast=true
-      - ApplyOutOfSyncOnly=true
-    retry:
-      limit: 5
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m
