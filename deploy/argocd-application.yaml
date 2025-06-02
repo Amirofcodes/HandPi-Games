@@ -12,6 +12,8 @@ spec:
     path: deploy
     repoURL: https://github.com/Amirofcodes/HandPi-Games.git
     targetRevision: main
+    kustomize:
+      version: v5.0.1
   syncPolicy:
     automated:
       prune: true
