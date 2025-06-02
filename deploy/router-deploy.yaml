@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: router
-          image: ghcr.io/amirofcodes/handpi-router:20250530-6ae299e
+          image: ghcr.io/amirofcodes/handpi-router:20250602-8bc89cb
           ports:
             - containerPort: 80
             - containerPort: 443
