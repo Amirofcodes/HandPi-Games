@@ -17,7 +17,7 @@ spec:
         - name: ghcr-cred
       containers:
         - name: backend
-          image: ghcr.io/amirofcodes/handpi-backend:20250602-3e6671c
+          image: ghcr.io/amirofcodes/handpi-backend:20250602-03df84c
           imagePullPolicy: Always
           envFrom:
             - secretRef:
