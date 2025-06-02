@@ -4,19 +4,27 @@ metadata:
   name: handpi-games
   namespace: argocd
 spec:
-  destination:
-    namespace: handpi-games
-    server: https://kubernetes.default.svc
   project: default
   source:
-    path: deploy
     repoURL: https://github.com/Amirofcodes/HandPi-Games.git
     targetRevision: main
-    kustomize:
-      version: v5.0.1
+    path: deploy
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: handpi-games
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

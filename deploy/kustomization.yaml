@@ -3,6 +3,10 @@ kind: Kustomization
 
 namespace: handpi-games
 
+commonLabels:
+  app.kubernetes.io/name: handpi-games
+  app.kubernetes.io/instance: production
+
 resources:
   - namespace.yaml
   - configmap.yaml
